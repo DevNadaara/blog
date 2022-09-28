@@ -1,0 +1,5 @@
+{
+  "db": "mongodb+srv://nadaara:12345@cluster0.qllofdb.mongodb.net/blog?retryWrites=true&w=majority",
+  "jwtKey": "mysecure",
+  "authRequired": true
+}

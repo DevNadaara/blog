@@ -47,7 +47,6 @@ const postSchema = new mongoose.Schema(
     likes: [
       {
         type: String,
-        default: [],
       },
     ],
   },

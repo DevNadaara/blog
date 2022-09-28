@@ -39,6 +39,7 @@ router.put(
   async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     req.body.password = await bcrypt.hash(req.body.password, salt);
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -57,6 +58,7 @@ router.put(
 
 router.delete("/:id", [validObjectId, auth], async (req, res) => {
   const user = await User.findByIdAndRemove(req.params.id);
+
   await Post.findByIdAndRemove({}, { "user.email": user.user.email });
   if (!user) return res.status(404).send("user is not exist in the db");
 

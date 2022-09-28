@@ -13,47 +13,34 @@ router.get("/", async (req, res) => {
   res.send(post);
 });
 
-router.post(
-  "/",
-  [validator(validate), upload.single("postImage")],
-  async (req, res) => {
-    const user = await User.findById(req.body.userId);
-
-    if (!user) return res.status(404).send("user is not found in the db");
-
-    const post = new Post({
-      title: req.body.title,
-      body: req.body.body,
-      tags: req.body.tags,
-
-      user: {
-        name: user.name,
-        email: user.email,
-      },
-    });
-    if (req.file) {
-      post.image = req.file.path;
-    }
-
-    const result = await post.save();
-
-    res.send(result);
-  }
-);
-
-router.put("/:id", [validator(validate), validObjectId], async (req, res) => {
+router.post("/", validator(validate), async (req, res) => {
   const user = await User.findById(req.body.userId);
 
+  if (!user) return res.status(404).send("user is not found in the db");
+
+  const post = new Post({
+    title: req.body.title,
+    body: req.body.body,
+    tags: req.body.tags,
+
+    user: {
+      name: user.name,
+      email: user.email,
+    },
+  });
+
+  const result = await post.save();
+
+  res.send(result);
+});
+
+router.put("/:id", [validator(validate), validObjectId], async (req, res) => {
   const post = await Post.findByIdAndUpdate(
     { _id: req.params.id },
     {
       title: req.body.title,
       body: req.body.body,
       tags: req.body.tags,
-      user: {
-        name: user.name,
-        email: user.email,
-      },
     },
     { new: true }
   );

@@ -5,7 +5,7 @@ const validObjectId = require("../middleware/validObjectId");
 const { Post } = require("../models/post");
 
 router.post("/", upload.single("postImage"), (req, res) => {
-  res.send("file uploaded");
+  res.send(req.file);
 });
 
 module.exports = router;

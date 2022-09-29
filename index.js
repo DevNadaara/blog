@@ -12,7 +12,7 @@ const users = require("./routes/users");
 const posts = require("./routes/posts");
 const tags = require("./routes/tags");
 const auth = require("./routes/auth");
-const upload = require("./routes/upload");
+// const upload = require("./routes/upload");
 const bodyParser = require("body-parser");
 
 const app = express();
@@ -26,9 +26,12 @@ if (!config.get("db") && !config.get("jwtKey")) {
   return process.exit(1);
 }
 
-const conn = mongoose.createConnection(config.get("db"));
-// .then(console.log("connected to blog db"))
-// .catch((err) => console.error("could not connected to mangodb..", err));
+mongoose
+  .connect(config.get("db"))
+  .then(console.log("connected to blog db"))
+  .catch((err) => console.error("could not connected to mangodb..", err));
+
+const conn = mongoose.connection;
 
 let gfs;
 conn.once("open", () => {
@@ -37,12 +40,13 @@ conn.once("open", () => {
 });
 
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api/users", users);
 app.use("/api/posts", posts);
 app.use("/api/tags", tags);
 app.use("/api/auth", auth);
-app.use("/api/upload", upload);
+// app.use("/api/upload", upload);
 
 app.use(error);
 

@@ -1,3 +1,4 @@
+const fs = require("node:fs");
 const validObjectId = require("../middleware/validObjectId");
 const validator = require("../middleware/validator");
 const auth = require("../middleware/auth");
@@ -13,26 +14,32 @@ router.get("/", async (req, res) => {
   res.send(post);
 });
 
-router.post("/", validator(validate), async (req, res) => {
-  const user = await User.findById(req.body.userId);
+router.post(
+  "/",
+  [upload.single("postImage"), validator(validate)],
+  async (req, res) => {
+    const user = await User.findById(req.body.userId);
 
-  if (!user) return res.status(404).send("user is not found in the db");
+    if (!user) return res.status(404).send("user is not found in the db");
+    const postImage = req.file;
+    if (!postImage) return res.status(400).send("add image");
 
-  const post = new Post({
-    title: req.body.title,
-    body: req.body.body,
-    tags: req.body.tags,
+    const post = new Post({
+      title: req.body.title,
+      body: req.body.body,
+      tags: req.body.tags,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+      postImage: postImage.path,
+    });
 
-    user: {
-      name: user.name,
-      email: user.email,
-    },
-  });
+    const result = await post.save();
 
-  const result = await post.save();
-
-  res.send(result);
-});
+    res.send(result);
+  }
+);
 
 router.put("/:id", [validator(validate), validObjectId], async (req, res) => {
   const post = await Post.findByIdAndUpdate(
@@ -53,9 +60,14 @@ router.put("/:id", [validator(validate), validObjectId], async (req, res) => {
 router.delete("/:id", [validObjectId, auth], async (req, res) => {
   const { user } = await Post.findById(req.params.id);
 
-  if (req.user.isAdmin || req.user.email === user.email) {
+  if (req.user.role === "admin" || req.user.email === user.email) {
     const post = await Post.findByIdAndRemove(req.params.id);
     if (!post) return res.status(404).send("user is not found in the db");
+
+    fs.unlink(`${__dirname}/${post.postImage}`, (err) => {
+      if (err) throw err;
+    });
+
     res.send(post);
   } else return res.status(401).send("unauthorised");
 });

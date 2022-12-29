@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
   } else {
     const tags = await Post.find({}, "tags");
 
-    res.send(tags);
+    res.send({ data: tags });
   }
 });
 

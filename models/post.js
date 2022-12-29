@@ -40,9 +40,15 @@ const postSchema = new mongoose.Schema(
         },
       }),
     },
-    postImage: {
-      type: String,
-      default: "",
+    cover: {
+      publicId: {
+        type: String,
+        default: "",
+      },
+      url: {
+        type: String,
+        default: "",
+      },
     },
     likes: [
       {
@@ -60,7 +66,6 @@ const validate = (obj) => {
     title: Joi.string().min(5).max(50).required(),
     body: Joi.string().min(5).required(),
     tags: Joi.array().items(Joi.string()).required(),
-    userId: Joi.objectId().required(),
     likes: Joi.array().items(Joi.string()),
   });
 

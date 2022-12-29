@@ -1,14 +1,15 @@
 const jwt = require("jsonwebtoken");
-const config = require("config");
 
 module.exports = function (req, res, next) {
-  if (!config.get("authRequired")) return next();
+  console.log(!process.env.AUTHREQUIRED);
+
+  if (process.env.AUTHREQUIRED === "false") return next();
   const token = req.header("x-auth-token");
 
   if (!token) return res.status(401).send("access denied");
 
   try {
-    const decoded = jwt.verify(token, config.get("jwtKey"));
+    const decoded = jwt.verify(token, process.env.JWTKEY);
     req.user = decoded;
     next();
   } catch (error) {

@@ -3,9 +3,14 @@ const { Post } = require("../models/post");
 
 const cloudinary = require("../middleware/cloudinary");
 
-exports.me = async (req, res) => {
-  const posts = await Post.find({ email: req.user.email });
+exports.getMe = async (req, res) => {
+  
+  const posts = await Post.find({ user: req.user._id });
+  res.send({ data: posts });
+};
 
+exports.getOne = async (req, res) => {
+  const posts = await Post.findById(req.params.id);
   res.send({ data: posts });
 };
 
@@ -14,28 +19,27 @@ exports.posts = async (req, res) => {
   res.send({ data: post });
 };
 exports.create = async (req, res) => {
-  const user = await User.find({ email: req.user.email });
+  const user = await User.findOne({ email: req.user.email });
 
   if (!user) return res.status(404).send("user is not found in the db");
 
-  const cover = req.file;
+  const cover = req.body.cover;
+  console.log(user);
   if (!cover) return res.status(400).send("add image");
 
   const post = new Post({
     title: req.body.title,
     body: req.body.body,
-    tags: req.body.tags,
-    user: {
-      name: user.name,
-      email: user.email,
-    },
+    summary: req.body.summary,
+    tags: req.body.tags.split(" "),
+    user: user._id,
   });
 
   if (cover) {
-    const upload = await cloudinary.uploader.upload(req.file.path, {
+    const upload = await cloudinary.uploader.upload(req.body.cover, {
       folder: "covers",
     });
-    user.cover = {
+    post.cover = {
       publicId: upload.public_id,
       url: upload.secure_url,
     };

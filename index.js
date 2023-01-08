@@ -3,7 +3,7 @@ Joi.objectId = require("joi-objectid")(Joi);
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
-const Grid = require("gridfs-stream");
+
 require("dotenv").config();
 require("express-async-errors");
 
@@ -12,14 +12,13 @@ const users = require("./routes/users");
 const posts = require("./routes/posts");
 const tags = require("./routes/tags");
 const auth = require("./routes/auth");
-// const upload = require("./routes/upload");
-const bodyParser = require("body-parser");
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+const corsOptions = {
+  exposedHeaders: "x-auth-token",
+};
+app.use(cors(corsOptions));
 
 mongoose
   .connect(process.env.DB)

@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
-  console.log(!process.env.AUTHREQUIRED);
-
   if (process.env.AUTHREQUIRED === "false") return next();
   const token = req.header("x-auth-token");
 

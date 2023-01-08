@@ -12,11 +12,13 @@ const {
   create,
   remove,
   update,
-  me,
+  getMe,
+  getOne,
 } = require("../controllers/postController");
 
 router.get("/", posts);
-router.get("/me", auth, me);
+router.get("/me", auth, getMe);
+router.get("/:id", getOne);
 
 router.post(
   "/",

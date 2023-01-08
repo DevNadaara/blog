@@ -7,8 +7,9 @@ const bcrypt = require("bcrypt");
 const cloudinary = require("../middleware/cloudinary");
 
 exports.me = async (req, res) => {
-  const user = await user.find({ email: req.user.email });
-  res.send(user);
+  const user = await User.findOne({ email: req.user.email });
+
+  res.send({ data: user });
 };
 exports.create = async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
@@ -22,15 +23,15 @@ exports.create = async (req, res) => {
     password: req.body.password,
   });
 
-  if (profile) {
-    const upload = await cloudinary.uploader.upload(req.file.path, {
-      folder: "profiles",
-    });
-    user.profile = {
-      publicId: upload.public_id,
-      url: upload.secure_url,
-    };
-  }
+  const upload = await cloudinary.uploader.upload(req.body.profile, {
+    folder: "profiles",
+  });
+  user.profile = {
+    publicId: upload.public_id,
+    url: upload.secure_url,
+  };
+  // if (profile) {
+  // }
 
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);

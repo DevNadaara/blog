@@ -7,7 +7,10 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 5,
-      maxlength: 50,
+    },
+    summary: {
+      type: String,
+      required: true,
     },
     body: {
       type: String,
@@ -25,20 +28,9 @@ const postSchema = new mongoose.Schema(
       required: true,
     },
     user: {
-      type: new mongoose.Schema({
-        name: {
-          type: String,
-          minlength: 5,
-          maxlength: 20,
-          required: true,
-        },
-        email: {
-          type: String,
-          minlength: 5,
-          maxlength: 255,
-          required: true,
-        },
-      }),
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
     },
     cover: {
       publicId: {
@@ -63,10 +55,12 @@ const Post = mongoose.model("Post", postSchema);
 
 const validate = (obj) => {
   const schema = Joi.object({
-    title: Joi.string().min(5).max(50).required(),
+    title: Joi.string().min(5).required(),
     body: Joi.string().min(5).required(),
-    tags: Joi.array().items(Joi.string()).required(),
+    summary: Joi.string().min(5).required(),
+    tags: Joi.string().required(),
     likes: Joi.array().items(Joi.string()),
+    cover: Joi.string(),
   });
 
   return schema.validate(obj);

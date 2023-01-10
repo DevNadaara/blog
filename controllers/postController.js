@@ -4,18 +4,17 @@ const { Post } = require("../models/post");
 const cloudinary = require("../middleware/cloudinary");
 
 exports.getMe = async (req, res) => {
-  
-  const posts = await Post.find({ user: req.user._id });
+  const posts = await Post.find({ user: req.user._id }).populate("user");
   res.send({ data: posts });
 };
 
 exports.getOne = async (req, res) => {
-  const posts = await Post.findById(req.params.id);
+  const posts = await Post.findById(req.params.id).populate("user");
   res.send({ data: posts });
 };
 
 exports.posts = async (req, res) => {
-  const post = await Post.find();
+  const post = await Post.find().sort("-createdAt").populate("user");
   res.send({ data: post });
 };
 exports.create = async (req, res) => {
@@ -23,8 +22,7 @@ exports.create = async (req, res) => {
 
   if (!user) return res.status(404).send("user is not found in the db");
 
-  const cover = req.body.cover;
-  console.log(user);
+  const cover = req.file;
   if (!cover) return res.status(400).send("add image");
 
   const post = new Post({
@@ -36,7 +34,7 @@ exports.create = async (req, res) => {
   });
 
   if (cover) {
-    const upload = await cloudinary.uploader.upload(req.body.cover, {
+    const upload = await cloudinary.uploader.upload(req.file.path, {
       folder: "covers",
     });
     post.cover = {

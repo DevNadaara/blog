@@ -20,11 +20,7 @@ router.get("/", posts);
 router.get("/me", auth, getMe);
 router.get("/:id", getOne);
 
-router.post(
-  "/",
-  [upload.single("postImage"), validator(validate), auth],
-  create
-);
+router.post("/", [upload.single("cover"), validator(validate), auth], create);
 
 router.put("/:id", [validator(validate), validObjectId, auth], update);
 

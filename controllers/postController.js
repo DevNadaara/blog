@@ -29,7 +29,7 @@ exports.create = async (req, res) => {
     title: req.body.title,
     body: req.body.body,
     summary: req.body.summary,
-    tags: req.body.tags.split(" "),
+    tags: req.body.tags.split(","),
     user: user._id,
   });
 
@@ -54,7 +54,8 @@ exports.update = async (req, res) => {
     {
       title: req.body.title,
       body: req.body.body,
-      tags: req.body.tags,
+      summary: req.body.summary,
+      tags: req.body.tags.split(","),
     },
     { new: true }
   );
@@ -65,11 +66,15 @@ exports.update = async (req, res) => {
 };
 
 exports.remove = async (req, res) => {
-  const { user } = await Post.findById(req.params.id);
+  const { user } = await Post.findById(req.params.id).populate("user");
 
   if (req.user.role === "admin" || req.user.email === user.email) {
     const post = await Post.findByIdAndRemove(req.params.id);
     if (!post) return res.status(404).send("user is not found in the db");
+
+    await cloudinary.uploader.destroy(post.cover.publicId, {
+      folder: "cover",
+    });
 
     res.send({ data: post });
   } else return res.status(401).send("unauthorised");

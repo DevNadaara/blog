@@ -23,7 +23,7 @@ exports.create = async (req, res) => {
     password: req.body.password,
   });
 
-  const upload = await cloudinary.uploader.upload(req.body.profile, {
+  const upload = await cloudinary.uploader.upload(req.file.path, {
     folder: "profiles",
   });
   user.profile = {
